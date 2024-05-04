@@ -3,6 +3,7 @@ from discord.ext import commands
 
 Token = 'Your_Token_Here'
 intents = discord.Intents.default()
+intents.message_content = True
 intents.messages = True
 intents.guilds = True
 
