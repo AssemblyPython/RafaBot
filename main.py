@@ -1,6 +1,8 @@
+import datetime
 import random
 
 import discord
+from discord import member
 from discord.ext import commands
 
 Token = ''
@@ -12,38 +14,30 @@ intents.guilds = True
 # Create a bot instance with the command prefix '!_RC'
 bot = commands.Bot(command_prefix='!RC ', intents=intents)
 Spammer = None
-
-
-
-@bot.event
-async def on_ready():
-    print('Bot is online!')
-    channel = bot.get_channel(1231177776850145280)  # Use your specific channel ID
-    user = bot.get_user(1231193596011741256)
-    if channel:
-        messages = channel.history(limit=500)
-        for message in messages:
-            message.delete()
-
-        await channel.send('Hello, I am now online!')
-    else:
-        print('Channel not found')
-
+SpammerMessageSearchDepth = 100
 
 
 @bot.command(name='GetSpammer')  # Vai buscar o maior spammer dos ultimos 5 minutos e guarda
 async def GetSpammer(ctx):
+    messageBlame = {}
+    async for message in ctx.channel.history(limit=SpammerMessageSearchDepth):
+        if message.author.name in messageBlame:
+            messageBlame[message.author.name] += 1
+        else:
+            messageBlame[message.author.name] = 1
 
-    await ctx.send()
+    Spammer = max(zip(messageBlame.values(), messageBlame.keys()))[1]
+    await ctx.send('Tu tem cuidado que andas a esticar-te Wii dred ' + Spammer)
 
-@bot.command(name='Spammer')
+
+@bot.command(name='SpammerHandler')
 async def SpammerHandler(ctx, arg):
     match arg:
         case 'Help':  #Help - Diz que comandos estao disponiveis
-            ctx.send("Os comandos disponiveis são: ZipIt, Amnesia, Help, o atual alvo é "+Spammer)
+            ctx.send("Os comandos disponiveis são: ZipIt, Amnesia, Help, o atual alvo é " + Spammer)
             pass
         case 'ZipIt':  #ZipIt - Timeout durante 30 segundos
-
+            await member.timeout(until=datetime.timedelta(seconds=30),reason="Spammer innnit")
             pass
         case 'Amnesia':  #Amnesia - Apagar as ultimas 10 mensagens do henrique no chat em questao
 
